@@ -1,7 +1,7 @@
 import gleam/float
 import gleam/int
 
-pub type Money {
+pub opaque type Money {
   Money(amount_in_cents: Int, currency: String)
 }
 
@@ -9,15 +9,23 @@ pub type CurrencyError {
   InvalidCurrencyError
 }
 
-pub fn add(from: Money, add: Money) -> Result(Money, CurrencyError) {
-  case add.currency != from.currency {
+pub fn new(amount: Int, currency: String) -> Money {
+  Money(amount, currency)
+}
+
+pub fn add(from: Money, other: Money) -> Result(Money, CurrencyError) {
+  case other.currency != from.currency {
     True -> Error(InvalidCurrencyError)
     False ->
       Ok(Money(
-        amount_in_cents: from.amount_in_cents + add.amount_in_cents,
+        amount_in_cents: amount(from) + amount(other),
         currency: from.currency,
       ))
   }
+}
+
+fn amount(money: Money) -> Int {
+  money.amount_in_cents
 }
 
 pub fn to_string(m: Money) -> String {
